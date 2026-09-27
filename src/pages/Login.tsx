@@ -1,0 +1,38 @@
+import { ArrowRight, BarChart3, CircleCheckBig, Eye, EyeOff, Flame, Flower2, Library, LockKeyhole, ShieldCheck, Sparkles, UserRound, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import './LoginV2.css';
+
+const practices=[
+  {icon:Library,label:'Jaap',text:'Count every repetition'},
+  {icon:Flame,label:'Sadhana',text:'Keep a daily vow'},
+  {icon:CircleCheckBig,label:'Sankalpa',text:'Live your intentions'},
+  {icon:Flower2,label:'Meditation',text:'Create quiet space'},
+];
+
+export default function Login(){
+  const {user,login,register}=useAuth();const navigate=useNavigate();const [sheetOpen,setSheetOpen]=useState(false);const [mode,setMode]=useState<'login'|'register'>('login');const [showPassword,setShowPassword]=useState(false);const [accepted,setAccepted]=useState(false);const [error,setError]=useState('');const [busy,setBusy]=useState(false);
+  useEffect(()=>{const close=(event:KeyboardEvent)=>{if(event.key==='Escape')setSheetOpen(false)};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close)},[]);
+  if(user)return <Navigate to="/home" replace/>;
+  function open(next:'login'|'register'){setMode(next);setError('');setSheetOpen(true)}
+  async function submit(event:React.FormEvent<HTMLFormElement>){event.preventDefault();setError('');if(mode==='register'&&!accepted){setError('Please accept the device-storage terms to continue.');return}const values=new FormData(event.currentTarget);setBusy(true);const result=mode==='register'?await register(String(values.get('name')),String(values.get('username')),String(values.get('password'))):await login(String(values.get('username')),String(values.get('password')));setBusy(false);if(!result.ok)setError(result.message||'Unable to continue.');else navigate('/home')}
+
+  return <main className="login-v2">
+    <section className="login-hero">
+      <nav className="login-nav"><a href="#top" className="login-logo"><span>ॐ</span><b>Digital Sadhana</b></a><div><button onClick={()=>open('login')}>Sign in</button><button className="nav-create" onClick={()=>open('register')}>Create your space</button></div></nav>
+      <div className="login-hero-content" id="top">
+        <motion.div className="login-copy" initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.55}}><span className="login-eyebrow"><Sparkles/>A quieter way to stay consistent</span><h1>Return to what<br/>matters, every day.</h1><p>One private place for mantra, meditation, intention, and reflection. Build focus gently, see your effort clearly, and let practice become part of your life.</p><div className="login-actions"><button className="login-primary" onClick={()=>open('register')}>Begin your journey <ArrowRight/></button><button className="login-secondary" onClick={()=>open('login')}>I already have an account</button></div><div className="login-trust"><ShieldCheck/><span>Stored privately on this device. No server, tracking, or cloud account.</span></div></motion.div>
+        <div className="practice-visual" aria-hidden="true"><motion.div className="visual-orbit orbit-one" animate={{rotate:360}} transition={{duration:42,repeat:Infinity,ease:'linear'}}/><motion.div className="visual-orbit orbit-two" animate={{rotate:-360}} transition={{duration:29,repeat:Infinity,ease:'linear'}}/><motion.div className="visual-core" animate={{scale:[1,1.035,1]}} transition={{duration:4,repeat:Infinity,ease:'easeInOut'}}><span>ॐ</span><small>Begin within</small></motion.div>{practices.map(({icon:Icon,label},index)=><motion.div className={`orbit-item orbit-item-${index+1}`} key={label} animate={{y:[0,-7,0]}} transition={{duration:3.5+index*.35,repeat:Infinity,ease:'easeInOut'}}><Icon/><span>{label}</span></motion.div>)}</div>
+      </div>
+      <div className="practice-ribbon">{practices.map(({icon:Icon,label,text})=><div key={label}><Icon/><span><b>{label}</b><small>{text}</small></span></div>)}</div>
+    </section>
+
+    <section className="login-purpose"><div><span>BUILT FOR REAL PRACTICE</span><h2>Direction without pressure.</h2></div><p>Digital Sadhana is not another feed competing for your attention. It is a calm container: choose a vow, complete today’s practice, sit in meditation, honour an intention, and leave. Your history quietly turns effort into a visible journey.</p><div className="purpose-result"><BarChart3/><span><b>Your progress stays meaningful</b><small>Daily counts, streaks, mantra totals, milestones, and Sadhana days come from what you actually complete.</small></span></div></section>
+
+    <AnimatePresence>
+      {sheetOpen&&<motion.div className="auth-sheet-backdrop" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onMouseDown={()=>setSheetOpen(false)}><motion.section className="auth-sheet" role="dialog" aria-modal="true" aria-labelledby="auth-title" initial={{opacity:0,y:28,scale:.98}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:22,scale:.98}} transition={{type:'spring',stiffness:260,damping:27}} onMouseDown={event=>event.stopPropagation()}><button className="sheet-close" onClick={()=>setSheetOpen(false)} aria-label="Close account form"><X/></button><div className="sheet-mark">ॐ</div><span className="sheet-overline">{mode==='login'?'Welcome back':'Begin your journey'}</span><h2 id="auth-title">{mode==='login'?'Return to your practice':'Create your sacred space'}</h2><p>{mode==='login'?'Continue the journey saved on this device.':'A private local account for your complete practice journey.'}</p><div className="sheet-tabs"><button className={mode==='login'?'active':''} onClick={()=>{setMode('login');setError('')}}>Sign in</button><button className={mode==='register'?'active':''} onClick={()=>{setMode('register');setError('')}}>Create account</button></div><form onSubmit={submit}><AnimatePresence initial={false}>{mode==='register'&&<motion.label initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}}>Your name<div><UserRound/><input name="name" required placeholder="How should we greet you?"/></div></motion.label>}</AnimatePresence><label>Username<div><UserRound/><input name="username" required autoCapitalize="none" autoComplete="username" placeholder="your.username"/></div></label><label>Password<div><LockKeyhole/><input name="password" required minLength={6} type={showPassword?'text':'password'} autoComplete={mode==='login'?'current-password':'new-password'} placeholder="At least 6 characters"/><button type="button" aria-label={showPassword?'Hide password':'Show password'} onClick={()=>setShowPassword(value=>!value)}>{showPassword?<EyeOff/>:<Eye/>}</button></div></label>{mode==='register'&&<motion.label className="sheet-terms" initial={{opacity:0}} animate={{opacity:1}}><input type="checkbox" checked={accepted} onChange={event=>setAccepted(event.target.checked)}/><span><b>Device-only storage</b>Your account and practice data live in this browser. Clearing browser data or losing the device permanently removes them; there is no cloud recovery.</span></motion.label>}{error&&<motion.p className="sheet-error" initial={{x:-8,opacity:0}} animate={{x:0,opacity:1}}>{error}</motion.p>}<button className="sheet-submit" disabled={busy}>{busy?'Preparing your space':mode==='login'?'Enter my practice':'Create my local account'}<ArrowRight/></button></form><div className="sheet-private"><ShieldCheck/>Nothing leaves this device.</div></motion.section></motion.div>}
+    </AnimatePresence>
+  </main>;
+}

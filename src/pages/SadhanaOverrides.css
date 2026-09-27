@@ -1,0 +1,22 @@
+.mantra-choices button > i:empty { background: transparent; }
+@media (max-width: 850px) { .sadhana-actions { bottom: 72px; } }
+
+@media (max-width: 850px) {
+  .sadhana-builder,
+  .sadhana-workspace {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .sadhana-stage {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding-bottom: 185px;
+  }
+
+  .sadhana-actions {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}

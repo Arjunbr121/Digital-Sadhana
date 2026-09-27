@@ -1,0 +1,6 @@
+import type {ReactNode} from 'react';import {ChevronRight} from 'lucide-react';import {Link} from 'react-router-dom';
+export function PageHead({eyebrow,title,action}:{eyebrow?:string;title:string;action?:ReactNode}){return <header className="page-head"><div>{eyebrow&&<span className="eyebrow">{eyebrow}</span>}<h1>{title}</h1></div>{action}</header>}
+export function Stat({value,label}:{value:string;label:string}){return <div className="stat"><strong>{value}</strong><span>{label}</span></div>}
+export function Ring({value,max,size=120,label}:{value:number;max:number;size?:number;label?:string}){const pct=Math.min(100,value/max*100);return <div className="ring" style={{width:size,height:size,background:`conic-gradient(var(--terra) ${pct}%, var(--line) 0)`}}><div><strong>{value}</strong><span>{label||`of ${max}`}</span></div></div>}
+export function SectionTitle({title,to,label='View all'}:{title:string;to?:string;label?:string}){return <div className="section-title"><h2>{title}</h2>{to&&<Link to={to}>{label}<ChevronRight size={16}/></Link>}</div>}
+export function Empty({icon,title,text}:{icon:ReactNode;title:string;text:string}){return <div className="empty">{icon}<h3>{title}</h3><p>{text}</p></div>}
